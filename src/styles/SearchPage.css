@@ -66,6 +66,7 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
     justify-items: center;
+
   }
   
   .load-more-button {
@@ -86,5 +87,15 @@
   
   p {
     text-align: center;
+  }
+  .no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px; /* גובה כדי למקם את הטקסט באמצע */
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    color: #ffffff; /* צבע מותאם לרקע כהה */
   }
   

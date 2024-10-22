@@ -173,14 +173,15 @@ function SearchPage() {
       </form>
 
       <div className="movies-grid">
-        {movies && movies.length > 0 ? (
-          movies.map((movie, index) => (
-            <MovieCard key={`${movie.id}-${index}`} movie={movie} />
-          ))
-        ) : (
-          <p>לא נמצאו תוצאות עבור החיפוש שלך.</p>
-        )}
-      </div>
+  {movies && movies.length > 0 ? (
+    movies.map((movie, index) => (
+      <MovieCard key={`${movie.id}-${index}`} movie={movie} />
+    ))
+  ) : (
+    <p className="no-results">לא נמצאו תוצאות עבור החיפוש שלך.</p>
+  )}
+</div>
+
 
       {movies && movies.length > 0 && (
         <button className="load-more-button" onClick={loadMoreMovies}>
