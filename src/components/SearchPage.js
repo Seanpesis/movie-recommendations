@@ -1,5 +1,5 @@
 // SearchPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MovieCard from './MovieCard';
@@ -10,17 +10,15 @@ function SearchPage() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [page, setPage] = useState(1); // הוספת מצב עבור מספר העמוד
-  const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+  const [page, setPage] = useState(1);
+  const API_KEY = '4ce89973e7188fba0e5a22998d8267f6'; // השתמש במפתח ישירות במקום לקרוא מה .env
 
   const navigate = useNavigate();
 
-  // פונקציה לחזרה לעמוד הבית
   const handleGoHome = () => {
     navigate('/');
   };
 
-  // שליפת רשימת הז'אנרים
   useEffect(() => {
     const fetchGenres = async () => {
       try {
@@ -36,45 +34,7 @@ function SearchPage() {
     fetchGenres();
   }, [API_KEY]);
 
-  // שליפת סרטים
-  const fetchMovies = async () => {
-    let url = '';
-    if (searchType === 'top_rated') {
-      url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=he-IL&page=${page}`;
-    } else if (searchType === 'genre' && query) {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'release_date' && query) {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_year=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'movie_name' && query) {
-      url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'director_name' && query) {
-      await fetchMoviesByDirector();
-      return;
-    } else {
-      console.warn('No query provided or invalid search type');
-      setMovies([]);
-      return;
-    }
-
-    console.log('Fetching URL:', url);
-
-    try {
-      const response = await axios.get(url);
-      console.log('API Response:', response.data);
-
-      if (page === 1) {
-        setMovies(response.data.results);
-      } else {
-        setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
-      }
-    } catch (error) {
-      console.error('Error fetching movies:', error);
-      setMovies([]);
-    }
-  };
-
-  // שליפת סרטים לפי במאי
-  const fetchMoviesByDirector = async () => {
+  const fetchMoviesByDirector = useCallback(async () => {
     try {
       const personResponse = await axios.get(
         `https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&query=${query}&language=he-IL`
@@ -97,22 +57,50 @@ function SearchPage() {
       console.error('Error fetching movies by director:', error);
       setMovies([]);
     }
-  };
+  }, [API_KEY, query, page]); // הוספת fetchMoviesByDirector כתלות
 
-  // שליפת הסרטים הראשוניים והאזנה לשינויים
+  const fetchMovies = useCallback(async () => {
+    let url = '';
+    if (searchType === 'top_rated') {
+      url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=he-IL&page=${page}`;
+    } else if (searchType === 'genre' && query) {
+      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'release_date' && query) {
+      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_year=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'movie_name' && query) {
+      url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'director_name' && query) {
+      await fetchMoviesByDirector();
+      return;
+    } else {
+      console.warn('No query provided or invalid search type');
+      setMovies([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(url);
+      if (page === 1) {
+        setMovies(response.data.results);
+      } else {
+        setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
+      }
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+      setMovies([]);
+    }
+  }, [searchType, query, page, API_KEY, fetchMoviesByDirector]);
+
   useEffect(() => {
     fetchMovies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchType, query, page]); // הוספת 'query' ו-'page' לתלויות
+  }, [fetchMovies]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Search initiated with query:', query);
-    setPage(1); // איפוס העמוד בעת חיפוש חדש
+    setPage(1);
     fetchMovies();
   };
 
-  // פונקציה לטעינת עוד סרטים
   const loadMoreMovies = () => {
     setPage((prevPage) => prevPage + 1);
   };
@@ -130,7 +118,7 @@ function SearchPage() {
             setSearchType(e.target.value);
             setQuery('');
             setMovies([]);
-            setPage(1); // איפוס העמוד
+            setPage(1);
           }}
         >
           <option value="top_rated">המובחרים</option>
@@ -145,7 +133,7 @@ function SearchPage() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); // איפוס העמוד
+              setPage(1);
             }}
           >
             <option value="">בחר ז'אנר</option>
@@ -164,7 +152,7 @@ function SearchPage() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); // איפוס העמוד
+              setPage(1);
             }}
           />
         )}
@@ -173,15 +161,14 @@ function SearchPage() {
       </form>
 
       <div className="movies-grid">
-  {movies && movies.length > 0 ? (
-    movies.map((movie, index) => (
-      <MovieCard key={`${movie.id}-${index}`} movie={movie} />
-    ))
-  ) : (
-    <p className="no-results">לא נמצאו תוצאות עבור החיפוש שלך.</p>
-  )}
-</div>
-
+        {movies && movies.length > 0 ? (
+          movies.map((movie, index) => (
+            <MovieCard key={`${movie.id}-${index}`} movie={movie} />
+          ))
+        ) : (
+          <p className="no-results">לא נמצאו תוצאות עבור החיפוש שלך.</p>
+        )}
+      </div>
 
       {movies && movies.length > 0 && (
         <button className="load-more-button" onClick={loadMoreMovies}>
