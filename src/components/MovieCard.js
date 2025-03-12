@@ -7,7 +7,6 @@ function MovieCard({ movie }) {
     ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
     : 'https://via.placeholder.com/300x450?text=No+Image';
 
-  // קישור לחיפוש הסרט ב-Google עם תוספת לצפייה ישירה בעברית
   const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(movie.title)}+לצפייה+ישירה`;
 
   return (
