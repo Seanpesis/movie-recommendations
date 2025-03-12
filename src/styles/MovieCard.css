@@ -1,11 +1,10 @@
-/* MovieCard.css */
 .movie-card {
     background-color: #2e2e2e;
     border-radius: 10px;
     overflow: hidden;
     text-align: center;
     color: #ffffff;
-    max-width: 200px; /* הוספת הגבלת רוחב מקסימלי */
+    max-width: 200px; 
 
   }
   
@@ -30,7 +29,7 @@
     display: inline-block;
     padding: 0.5rem 1rem;
     margin-top: 0.5rem;
-    background-color: #ff8000; /* צבע כתום להתאמה לעיצוב */
+    background-color: #ff8000; 
     color: #ffffff;
     text-decoration: none;
     border-radius: 5px;
@@ -40,5 +39,5 @@
   }
   
   .watch-button:hover {
-    background-color: #e67300; /* צבע כהה יותר במעבר עכבר */
+    background-color: #e67300; 
   }

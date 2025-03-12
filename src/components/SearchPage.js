@@ -1,4 +1,3 @@
-// SearchPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,17 +9,15 @@ function SearchPage() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [page, setPage] = useState(1); // הוספת מצב עבור מספר העמוד
+  const [page, setPage] = useState(1); 
   const API_KEY = '7926efe5ed0c909bd5775074f63c529f';
 
   const navigate = useNavigate();
 
-  // פונקציה לחזרה לעמוד הבית
   const handleGoHome = () => {
     navigate('/');
   };
 
-  // שליפת רשימת הז'אנרים
   useEffect(() => {
     const fetchGenres = async () => {
       try {
@@ -36,7 +33,6 @@ function SearchPage() {
     fetchGenres();
   }, [API_KEY]);
 
-  // שליפת סרטים
   const fetchMovies = async () => {
     let url = '';
     if (searchType === 'top_rated') {
@@ -73,7 +69,6 @@ function SearchPage() {
     }
   };
 
-  // שליפת סרטים לפי במאי
   const fetchMoviesByDirector = async () => {
     try {
       const personResponse = await axios.get(
@@ -99,20 +94,17 @@ function SearchPage() {
     }
   };
 
-  // שליפת הסרטים הראשוניים והאזנה לשינויים
   useEffect(() => {
     fetchMovies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchType, query, page]); // הוספת 'query' ו-'page' לתלויות
+  }, [searchType, query, page]); 
 
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Search initiated with query:', query);
-    setPage(1); // איפוס העמוד בעת חיפוש חדש
+    setPage(1); 
     fetchMovies();
   };
 
-  // פונקציה לטעינת עוד סרטים
   const loadMoreMovies = () => {
     setPage((prevPage) => prevPage + 1);
   };
@@ -130,7 +122,7 @@ function SearchPage() {
             setSearchType(e.target.value);
             setQuery('');
             setMovies([]);
-            setPage(1); // איפוס העמוד
+            setPage(1);
           }}
         >
           <option value="top_rated">המובחרים</option>
@@ -145,7 +137,7 @@ function SearchPage() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); // איפוס העמוד
+              setPage(1);
             }}
           >
             <option value="">בחר ז'אנר</option>
@@ -164,7 +156,7 @@ function SearchPage() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); // איפוס העמוד
+              setPage(1); 
             }}
           />
         )}

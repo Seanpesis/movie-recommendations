@@ -1,7 +1,6 @@
-/* ChatPage.css */
 
 .chat-container {
-    background-color: #1e1e1e; /* רקע כהה */
+    background-color: #1e1e1e; 
     color: #ffffff;
     min-height: 100vh;
     padding: 2rem;
@@ -15,11 +14,11 @@
   .chat-box {
     width: 80%;
     max-width: 600px;
-    background-color: #2e2e2e; /* צבע כהה יותר להבלטת תיבת הצ'אט */
+    background-color: #2e2e2e; 
     border-radius: 10px;
     padding: 1rem;
     overflow-y: auto;
-    height: 400px; /* הגדרת גובה קבוע */
+    height: 400px; 
     margin-bottom: 1rem;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
     display: flex;
@@ -27,27 +26,26 @@
   }
   
   .chat-message {
-    padding: 0.5rem 1rem; /* הוספת רווח משני הצדדים */
+    padding: 0.5rem 1rem; 
     border-radius: 10px;
     margin-bottom: 0.5rem;
     line-height: 1.4;
-    max-width: 80%; /* לאפשר להודעות להיות רחבות יותר */
-  }
+    max-width: 80%; 
   
   .chat-message.user {
-    background-color: #ff8000; /* צבע כתום למשתמש */
+    background-color: #ff8000; 
     color: #ffffff;
-    text-align: left; /* יישור לשמאל */
-    align-self: flex-start; /* הצגת ההודעות בצד שמאל */
-    width: 100%; /* הרחבת ההודעה על כל הרוחב */
+    text-align: left;
+    align-self: flex-start; 
+    width: 100%; 
   }
-  
+}
   .chat-message.bot {
-    background-color: #444; /* צבע כהה יותר לבוט */
+    background-color: #444;
     color: #ffffff;
-    text-align: right; /* יישור לימין */
-    align-self: flex-end; /* הצגת ההודעות בצד ימין */
-    max-width: 80%; /* שמירה על גודל הודעות הבוט */
+    text-align: right; 
+    align-self: flex-end; 
+    max-width: 80%;
   }
   
   input[type="text"] {

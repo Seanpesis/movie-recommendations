@@ -1,4 +1,3 @@
-// HomePage.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,7 +18,7 @@ function HomePage() {
         const movies = response.data.results;
         const images = movies
           .map((movie) => `https://image.tmdb.org/t/p/original${movie.backdrop_path}`)
-          .filter((path) => path); // מסנן תמונות תקינות
+          .filter((path) => path); 
         setBackgroundImages(images);
       } catch (error) {
         console.error('Error fetching background images:', error);
@@ -34,7 +33,7 @@ function HomePage() {
     if (backgroundImages.length > 0) {
       interval = setInterval(() => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-      }, 5000); // משנה תמונה כל 5 שניות
+      }, 5000);
     }
     return () => clearInterval(interval);
   }, [backgroundImages]);
