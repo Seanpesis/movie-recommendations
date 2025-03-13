@@ -46,7 +46,6 @@ function ChatPage() {
             })),
             { role: 'user', content: input },
           ],
-          max_tokens: 3000,
           temperature: 0.7,
         },
         {
