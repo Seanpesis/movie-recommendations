@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MovieCard from './MovieCard';
@@ -9,67 +9,16 @@ function SearchPage() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [page, setPage] = useState(1); 
+  const [page, setPage] = useState(1);
   const API_KEY = '7926efe5ed0c909bd5775074f63c529f';
 
   const navigate = useNavigate();
 
-  const handleGoHome = () => {
+  const handleGoHome = useCallback(() => {
     navigate('/');
-  };
+  }, [navigate]);
 
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=he-IL`
-        );
-        setGenres(response.data.genres);
-      } catch (error) {
-        console.error('Error fetching genres:', error);
-      }
-    };
-
-    fetchGenres();
-  }, [API_KEY]);
-
-  const fetchMovies = async () => {
-    let url = '';
-    if (searchType === 'top_rated') {
-      url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=he-IL&page=${page}`;
-    } else if (searchType === 'genre' && query) {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'release_date' && query) {
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_year=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'movie_name' && query) {
-      url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=he-IL&page=${page}`;
-    } else if (searchType === 'director_name' && query) {
-      await fetchMoviesByDirector();
-      return;
-    } else {
-      console.warn('No query provided or invalid search type');
-      setMovies([]);
-      return;
-    }
-
-    console.log('Fetching URL:', url);
-
-    try {
-      const response = await axios.get(url);
-      console.log('API Response:', response.data);
-
-      if (page === 1) {
-        setMovies(response.data.results);
-      } else {
-        setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
-      }
-    } catch (error) {
-      console.error('Error fetching movies:', error);
-      setMovies([]);
-    }
-  };
-
-  const fetchMoviesByDirector = async () => {
+  const fetchMoviesByDirector = useCallback(async () => {
     try {
       const personResponse = await axios.get(
         `https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&query=${query}&language=he-IL`
@@ -92,22 +41,68 @@ function SearchPage() {
       console.error('Error fetching movies by director:', error);
       setMovies([]);
     }
-  };
+  }, [API_KEY, query, page]);
+
+  const fetchMovies = useCallback(async () => {
+    let url = '';
+    if (searchType === 'top_rated') {
+      url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=he-IL&page=${page}`;
+    } else if (searchType === 'genre' && query) {
+      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'release_date' && query) {
+      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_year=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'movie_name' && query) {
+      url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=he-IL&page=${page}`;
+    } else if (searchType === 'director_name' && query) {
+      await fetchMoviesByDirector();
+      return;
+    } else {
+      console.warn('No query provided or invalid search type');
+      setMovies([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(url);
+      if (page === 1) {
+        setMovies(response.data.results);
+      } else {
+        setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
+      }
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+      setMovies([]);
+    }
+  }, [API_KEY, searchType, query, page, fetchMoviesByDirector]);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=he-IL`
+        );
+        setGenres(response.data.genres);
+      } catch (error) {
+        console.error('Error fetching genres:', error);
+      }
+    };
+
+    fetchGenres();
+  }, [API_KEY]);
 
   useEffect(() => {
     fetchMovies();
-  }, [searchType, query, page]); 
+  }, [fetchMovies]);
 
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     e.preventDefault();
-    console.log('Search initiated with query:', query);
-    setPage(1); 
+    setPage(1);
     fetchMovies();
-  };
+  }, [fetchMovies]);
 
-  const loadMoreMovies = () => {
+  const loadMoreMovies = useCallback(() => {
     setPage((prevPage) => prevPage + 1);
-  };
+  }, []);
 
   return (
     <div className="search-container">
@@ -156,7 +151,7 @@ function SearchPage() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); 
+              setPage(1);
             }}
           />
         )}
@@ -165,15 +160,14 @@ function SearchPage() {
       </form>
 
       <div className="movies-grid">
-  {movies && movies.length > 0 ? (
-    movies.map((movie, index) => (
-      <MovieCard key={`${movie.id}-${index}`} movie={movie} />
-    ))
-  ) : (
-    <p className="no-results">לא נמצאו תוצאות עבור החיפוש שלך.</p>
-  )}
-</div>
-
+        {movies && movies.length > 0 ? (
+          movies.map((movie, index) => (
+            <MovieCard key={`${movie.id}-${index}`} movie={movie} />
+          ))
+        ) : (
+          <p className="no-results">לא נמצאו תוצאות עבור החיפוש שלך.</p>
+        )}
+      </div>
 
       {movies && movies.length > 0 && (
         <button className="load-more-button" onClick={loadMoreMovies}>
